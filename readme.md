@@ -22,8 +22,7 @@ Wimon was created to take strength measures of neighbouring wifi devices and tra
 
 **IMPORTANT:**
 
-> Take into account that if you want to listen to an specific channel you should
-> configure your wireless adapter by using iwconfig too:
+ Take into account that if you want to listen to an specific channel you should configure your wireless adapter by using iwconfig too:
 
 	iwconfig wlan0 mode monitor channel 6
 
@@ -47,10 +46,17 @@ or
 
 #### References:
 
-	[pcap homepage](http://www.tcpdump.org/pcap.html)
-	[libpcap and 802.11 Wireless Networks](http://books.gigatux.nl/mirror/networksecuritytools/0596007949/networkst-CHP-10-SECT-3.html)
-	[libpcap tutorial](http://homes.di.unimi.it/~gfp/SiRe/2002-03/progetti/libpcap-tutorial.html)
-	[Aprendiendo a programar con pcap](http://www.e-ghost.deusto.es/docs/2005/conferencias/pcap.pdf)
-	[Packet Analysis](http://yuba.stanford.edu/~casado/pcap/section4.html)
-	[Getting Started with libpcap](http://books.gigatux.nl/mirror/networksecuritytools/0596007949/networkst-CHP-10-SECT-2.html)
-	[Radiotap git](http://git.sipsolutions.net/?p=radiotap.git;a=tree;h=refs/heads/master;hb=refs/heads/master)
+
+[pcap homepage](http://www.tcpdump.org/pcap.html)
+	
+[libpcap and 802.11 Wireless Networks](http://books.gigatux.nl/mirror/networksecuritytools/0596007949/networkst-CHP-10-SECT-3.html)
+	
+[libpcap tutorial](http://homes.di.unimi.it/~gfp/SiRe/2002-03/progetti/libpcap-tutorial.html)
+	
+[Aprendiendo a programar con pcap](http://www.e-ghost.deusto.es/docs/2005/conferencias/pcap.pdf)
+	
+[Packet Analysis](http://yuba.stanford.edu/~casado/pcap/section4.html)
+	
+[Getting Started with libpcap](http://books.gigatux.nl/mirror/networksecuritytools/0596007949/networkst-CHP-10-SECT-2.html)
+	
+[Radiotap git](http://git.sipsolutions.net/?p=radiotap.git;a=tree;h=refs/heads/master;hb=refs/heads/master)
