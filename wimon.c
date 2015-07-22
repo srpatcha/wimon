@@ -36,6 +36,7 @@ char *mac;
 unsigned int output_opt = TERMINAL_OUTPUT;	// show info on the screen or send it over the network
 unsigned int daemon_opt = 0;								// run in daemon mode or not
 unsigned int color_opt = 0;									// Coloured output option
+unsigned int verbose_opt = 0;
 
 int type = 0;		// Packet type , PRISM, AVS or Radiotap
 int wired = 0;		// It is wired or not?
@@ -47,7 +48,7 @@ int main(int argc, char *argv[]){
 	// Parsing the terminal arguments
 
 	int opt;
-	while ((opt = getopt(argc, argv, "m:u:i:p:hdc")) != -1) {
+	while ((opt = getopt(argc, argv, "m:u:i:p:hdcv")) != -1) {
 		switch(opt) {
 			case 'u':
 				ip = optarg;
@@ -72,6 +73,9 @@ int main(int argc, char *argv[]){
 				break;
 			case 'c':
 				color_opt = 1;
+				break;
+			case 'v':
+				verbose_opt = 1;
 				break;
 		}
 	}
@@ -186,10 +190,8 @@ void print_mac(char *mac_addr){
 void print_mem(void const *vp, size_t n){
 	int i=0;
     unsigned char const *p = vp;
-    printf("----\n");
     for (i=0; i<n; i++)
         printf("%02x", p[i]);
-    printf("\n----\n");
 }
 /*
 *		gracefully handle a Control C
@@ -210,6 +212,29 @@ void ctrl_c ( ){
 	This method gives you all the values your card is giving you so you can
 	choose what fits best for you.
 */
+/*
+	 * IEEE80211_RADIOTAP_TSFT              __le64       microseconds
+	 * IEEE80211_RADIOTAP_CHANNEL           2 x uint16_t   MHz, bitmap
+	 * IEEE80211_RADIOTAP_FHSS              uint16_t       see below
+	 * IEEE80211_RADIOTAP_RATE              u8           500kb/s
+	 * IEEE80211_RADIOTAP_DBM_ANTSIGNAL     s8           decibels from
+	 * IEEE80211_RADIOTAP_DBM_ANTNOISE      s8           decibels from
+	 * IEEE80211_RADIOTAP_DB_ANTSIGNAL      u8           decibel (dB)
+	 * IEEE80211_RADIOTAP_DB_ANTNOISE       u8           decibel (dB)
+	 * IEEE80211_RADIOTAP_LOCK_QUALITY      uint16_t       unitless
+	 * IEEE80211_RADIOTAP_TX_ATTENUATION    uint16_t       unitless
+	 * IEEE80211_RADIOTAP_DB_TX_ATTENUATION uint16_t       decibels (dB)
+	 * IEEE80211_RADIOTAP_DBM_TX_POWER      s8           decibels from
+	 * IEEE80211_RADIOTAP_FLAGS             u8           bitmap
+	 * IEEE80211_RADIOTAP_ANTENNA           u8           antenna index
+	 * IEEE80211_RADIOTAP_RX_FLAGS          uint16_t       bitmap
+	 * IEEE80211_RADIOTAP_TX_FLAGS          uint16_t       bitmap
+	 * IEEE80211_RADIOTAP_RTS_RETRIES       u8           data
+	 * IEEE80211_RADIOTAP_DATA_RETRIES      u8           data
+	 * IEEE80211_RADIOTAP_MCS	u8, u8, u8		unitless
+	 * IEEE80211_RADIOTAP_AMPDU_STATUS	u32, u16, u8, u8	unitlesss
+	 */
+
 void showRadiotapInfo(struct ieee80211_radiotap_header *radiotap_header, u_int16_t size){
 	printf("Total Size: %d\n",size);
 
@@ -226,10 +251,10 @@ void showRadiotapInfo(struct ieee80211_radiotap_header *radiotap_header, u_int16
 	while (!(err = ieee80211_radiotap_iterator_next(&iterator))) {
 		switch(iterator.this_arg_index){
 			case IEEE80211_RADIOTAP_TSFT:
-				printf("TSFT: %d\n",*iterator.this_arg);
+				printf("TSFT: %Le\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_FLAGS:
-				printf("FLAGS: %d\n",*iterator.this_arg);
+				printf("FLAGS: %x\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_RATE:
 				printf("RATE: %d\n",*iterator.this_arg);
@@ -238,7 +263,7 @@ void showRadiotapInfo(struct ieee80211_radiotap_header *radiotap_header, u_int16
 				printf("CHANNEL: %d\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_FHSS:
-				printf("HSS: %d\n",*iterator.this_arg);
+				printf("FHSS: %d\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_DBM_ANTSIGNAL:
 				printf("DBM_ANTSIGNAL: %d\n",*iterator.this_arg);
@@ -259,7 +284,7 @@ void showRadiotapInfo(struct ieee80211_radiotap_header *radiotap_header, u_int16
 				printf("DBM_TX_POWER: %d\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_ANTENNA:
-				printf("ANTENNA: %d\n",*iterator.this_arg);
+				printf("ANTENNA: %x\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
 				printf("DB_ANTSIGNAL: %d\n",*iterator.this_arg);
@@ -268,10 +293,10 @@ void showRadiotapInfo(struct ieee80211_radiotap_header *radiotap_header, u_int16
 				printf("DB_ANTNOISE: %d\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_RX_FLAGS:
-				printf("RX_FLAGS: %d\n",*iterator.this_arg);
+				printf("RX_FLAGS: %x\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_TX_FLAGS:
-				printf("TX_FLAGS: %d\n",*iterator.this_arg);
+				printf("TX_FLAGS: %x\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_RTS_RETRIES:
 				printf("RTS_RETRIES: %d\n",*iterator.this_arg);
@@ -294,7 +319,9 @@ void showRadiotapInfo(struct ieee80211_radiotap_header *radiotap_header, u_int16
 */
 int getStrength(struct ieee80211_radiotap_header *radiotap_header, u_int16_t size){
 
-	int8_t pwr = -1;
+	int8_t pwr_dbm = -1;
+	int8_t pwr_db = -1;
+	
 	int err = 1;
 
 	struct ieee80211_radiotap_iterator iterator;
@@ -306,12 +333,21 @@ int getStrength(struct ieee80211_radiotap_header *radiotap_header, u_int16_t siz
 	}
 
 	while (!(err = ieee80211_radiotap_iterator_next(&iterator))) {
-		if (iterator.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
-			pwr = *iterator.this_arg;
+		switch(iterator.this_arg_index){
+			case IEEE80211_RADIOTAP_DBM_ANTSIGNAL:
+				pwr_dbm = *iterator.this_arg;
+				break;
+			case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
+				pwr_db = *iterator.this_arg;
+				break;
 		}
 	}
-
-	return pwr;
+	if(pwr_dbm != -1){
+		return pwr_dbm
+	}
+	else{
+		return pwr_db;
+	}
 }
 
 /*
@@ -386,6 +422,12 @@ void process_packet (u_char * args, const struct pcap_pkthdr *header,const u_cha
 			}
 			print_mac(mac_addr);
 			printf("]\n");
+
+			if(verbose_opt==1){
+				showRadiotapInfo(radiotap_header,header->len);
+				printf("\n");
+			}
+
 			break;
 
 		case NETWORK_OUTPUT:
@@ -412,20 +454,18 @@ void process_packet (u_char * args, const struct pcap_pkthdr *header,const u_cha
 */
 void print_help(){
 	printf("\n WIMON: Wi-fi probe for localization services\n");
-	printf("\nTo send the output to stdout\n");
-	printf("\n	wimon -i [IF] \n");
-	printf("\nTo send the output to an ip address\n");
-	printf("\n	wimon -i [IF] -u [IP] -p [PORT]\n");
-	printf("\nTo view this help\n");
-	printf("\n	wimon -h\n");
 	printf("\n OPTIONS:\n");
-	printf("\n\t -h \tPrint this help\n");
-	printf("\n\t -i [IF]\tSpecify an interface to listen to\n");
-	printf("\n\t -u [IP]\tSpecify an IP to send the data instead of stdout\n");
-	printf("\n\t -p [PORT]\t specify the port you wnat to send the data\n");
-	printf("\n\t -d \t Use this if you want to run in daemon mode\n");
-	printf("\n\t -m [ID]\t If you want to add an identificator to the packet you are sending over the networkxryd\n");
-	printf("\n\t -c \t if you want to add some colour to the console output.\n\n");
+	printf("\t -h \tPrint this help\n");
+	printf("\t -i [IF]\tSpecify an interface to listen to\n");
+	printf("\t -u [IP]\tSpecify an IP to send the data instead of stdout\n");
+	printf("\t -p [PORT]\t specify the port you wnat to send the data\n");
+	printf("\t -d \t Use this if you want to run in daemon mode\n");
+	printf("\t -m [ID]\t If you want to add an identificator to the packet you are sending over the network\n");
+	printf("\t -c \t if you want to add some colour to the console output.\n\n");
+	printf("To send the output to stdout\n");
+	printf("	wimon -i [IF] \n");
+	printf("\nTo send the output to an ip address\n");
+	printf("	wimon -i [IF] -u [IP] -p [PORT]\n");
 	exit(1);
 }
 /*
