@@ -1,6 +1,6 @@
 # Wimon
 
-Wimon was created to take strength measures of neighbouring wifi devices and transmit them to a computer that would use all these information to locate such wifi devices.
+Wimon was created to take strength measures of neighbouring wifi devices on a determined channel and transmit them to a computer that would use all these information to locate such wifi devices ([Wi-Fi positioning system](https://en.wikipedia.org/wiki/Wi-Fi_positioning_system)).
 
 #### Compile with:
 
