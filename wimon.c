@@ -251,7 +251,7 @@ void showRadiotapInfo(struct ieee80211_radiotap_header *radiotap_header, u_int16
 	while (!(err = ieee80211_radiotap_iterator_next(&iterator))) {
 		switch(iterator.this_arg_index){
 			case IEEE80211_RADIOTAP_TSFT:
-				printf("TSFT: %Le\n",*iterator.this_arg);
+				printf("TSFT: %d\n",*iterator.this_arg);
 				break;
 			case IEEE80211_RADIOTAP_FLAGS:
 				printf("FLAGS: %x\n",*iterator.this_arg);
@@ -343,7 +343,7 @@ int getStrength(struct ieee80211_radiotap_header *radiotap_header, u_int16_t siz
 		}
 	}
 	if(pwr_dbm != -1){
-		return pwr_dbm
+		return pwr_dbm;
 	}
 	else{
 		return pwr_db;
@@ -462,6 +462,7 @@ void print_help(){
 	printf("\t -d \t Use this if you want to run in daemon mode\n");
 	printf("\t -m [ID]\t If you want to add an identificator to the packet you are sending over the network\n");
 	printf("\t -c \t if you want to add some colour to the console output.\n\n");
+	printf("\t -v \t if you want see some more information (buggy).\n\n");
 	printf("To send the output to stdout\n");
 	printf("	wimon -i [IF] \n");
 	printf("\nTo send the output to an ip address\n");
