@@ -2,14 +2,31 @@
 
 Wimon was created to take strength measures of neighbouring wifi devices on a determined channel and transmit them to a computer that would use all these information to locate such wifi devices ([Wi-Fi positioning system](https://en.wikipedia.org/wiki/Wi-Fi_positioning_system)).
 
+### Requeriments
+
+You need to install libpcap.
+
+```
+sudo apt-get update && sudo apt-get install libpcap-dev
+```
+
 #### Compile with:
 
-	gcc -Wall -o wimon wimon.c radiotap.c -lpcap
+		gcc -Wall -o wimon wimon.c radiotap.c -lpcap
+	
+or
+	
+		make all
+		
 
 #### Debug leaks with:
 
 	gcc -Wall -g -o wimon wimon.c radiotap.c -lpcap
 	valgrind --tool=memcheck --leak-check=yes wimon
+
+or
+
+	make debug
 
 #### First of all, put your card in Monitor mode:
 
@@ -19,12 +36,22 @@ Wimon was created to take strength measures of neighbouring wifi devices on a de
 	Madwifi			iwconfig <device> mode monitor
 	Wlan-ng			wlanctl-ng <device> lnxreq_wlansniff channel=<channel> enable=true
 	Radiotap		ifconfig <device> monitor up
+	
+**The easiest way** to configure your wireless device into monitor mode is to use the tool `airmon-ng` provided on the [aricrack-ng suite](https://www.aircrack-ng.org/). It's easy: download, untar, make, make install and enjoy. After that you should write something like this:
+
+```
+sudo airmon-ng start wlan0
+```
 
 **IMPORTANT:**
 
  Take into account that if you want to listen to an specific channel you should configure your wireless adapter by using iwconfig too:
 
 	iwconfig wlan0 mode monitor channel 6
+	
+or
+
+	sudo airmon-ng start wlan0 6
 
 
 #### After this, you can start using wimon
