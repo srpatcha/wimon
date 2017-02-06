@@ -16,6 +16,9 @@ sudo apt-get update && sudo apt-get install libpcap-dev
 	
 or
 	
+		make wimon
+
+or
 		make all
 		
 
@@ -71,6 +74,37 @@ or
 	./wimon -h
 
 
+# Get IP info (gip)
+
+**gip** is a simple program that tries to figure out the IP of the ethernet interface in which you are connected.
+
+It just listen to the packets that arrives to your network card, and extract its MAC and IP. Another (more effective) way could be to extract the MAC header and send malformed packets to the source MAC address in order to trigger a response.
+
+I did this after a night trying to remember what was the forgotten IP address of a router interface that I had been configuring, but I recommend to use wireshark to obtain more information about the device you're trying to connect to.
+
+#### Compile with:
+
+	gcc -Wall -o gip gip.c radiotap.c -lpcap
+
+or
+	
+		make gip
+
+or
+		make all
+		
+#### Usage
+
+	./gip -i eth1
+
+or
+
+	./gip -h
+
+or, if you want a continuous stream of IP addresses and macs received by your interface
+
+	./gip -c -i eth1
+	
 #### References:
 
 

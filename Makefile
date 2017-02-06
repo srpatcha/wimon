@@ -1,7 +1,7 @@
-SRC = *.c
+SRC = wimon.c radiotap.c
 CFLAGS = -Wall
 
-all: wimon
+all: wimon gip
 
 wimon:
 	gcc $(CFLAGS) -o wimon $(SRC) -lpcap
@@ -9,8 +9,12 @@ wimon:
 debug:
 	gcc  $(CFLAGS) -g -o wimon $(SRC) -lpcap
 	valgrind --tool=memcheck --leak-check=yes wimon
+
+gip:
+	gcc -Wall -o gip gip.c radiotap.c -lpcap
 	
 .PHONY: clean
 clean:
-	rm -f wimon *.o
+	rm -f wimon gip *.o
+	
 
